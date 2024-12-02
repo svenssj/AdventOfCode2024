@@ -21,10 +21,7 @@ public class Day1
             list1.Add(int.Parse(splits[0]));
             list2.Add(int.Parse(splits[1]));
         }
-
         Part2(list1, list2);
-
-
     }
 
     public void Part2(List<int> list1, List<int> list2)
