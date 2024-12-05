@@ -12,3 +12,4 @@ C:\Users\JonathanSvensson\code\AdventOfCode2024\Aoc2024\obj\Debug\net8.0\refint\
 C:\Users\JonathanSvensson\code\AdventOfCode2024\Aoc2024\obj\Debug\net8.0\Aoc2024.pdb
 C:\Users\JonathanSvensson\code\AdventOfCode2024\Aoc2024\obj\Debug\net8.0\Aoc2024.genruntimeconfig.cache
 C:\Users\JonathanSvensson\code\AdventOfCode2024\Aoc2024\obj\Debug\net8.0\ref\Aoc2024.dll
+C:\Users\JonathanSvensson\code\AdventOfCode2024\Aoc2024\obj\Debug\net8.0\Aoc2024.sourcelink.json
