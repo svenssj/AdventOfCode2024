@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.VisualBasic;
 
 public class Day16
@@ -16,7 +17,7 @@ public class Day16
     {
 
 
-        var lines = File.ReadAllLines("Day16\\example.txt");
+        var lines = File.ReadAllLines("Day16\\input.txt");
         _flatList = new List<Location>();
         _yLen = lines.Length;
         _xLen = lines[0].Length;
@@ -41,7 +42,7 @@ public class Day16
             }
         }
         _direction = DirectionEnum.East;
-        Print();
+        //  Print();
 
     }
 
@@ -50,46 +51,81 @@ public class Day16
         var current = _start;
         _start.LowestCostToGetHere = 0;
         _start.Visited = true;
-
-        while (current.X != _end.X && current.Y != _end.Y)
+        _start.WalkedHereFacing = _direction;
+        while (!(current.X == _end.X && current.Y == _end.Y))
         {
+            _direction = current.WalkedHereFacing;
             var left = GetLeft(current);
             if (left != null)
             {
+                left.PossibleWaysHere.Add(current);
                 if (!left.LowestCostToGetHere.HasValue || current.LowestCostToGetHere + 1 + 1000 < left.LowestCostToGetHere)
                 {
                     left.LowestCostToGetHere = current.LowestCostToGetHere + 1 + 1000;
-                    left.ArrivedHereFrom = current;
+                    left.BestWayHere = current;
+                    left.WalkedHereFacing = TurnLeft(_direction);
                 }
             }
             var forward = GetForward(current);
             if (forward != null)
                 if (forward != null)
                 {
+                    forward.PossibleWaysHere.Add(current);
                     if (!forward.LowestCostToGetHere.HasValue || current.LowestCostToGetHere + 1 < forward.LowestCostToGetHere)
                     {
                         forward.LowestCostToGetHere = current.LowestCostToGetHere + 1;
-                        forward.ArrivedHereFrom = current;
+                        forward.BestWayHere = current;
+                        forward.WalkedHereFacing = _direction;
                     }
                 }
             var right = GetRight(current);
             if (right != null)
             {
+                right.PossibleWaysHere.Add(current);
                 if (!right.LowestCostToGetHere.HasValue || current.LowestCostToGetHere + 1 + 1000 < right.LowestCostToGetHere)
                 {
                     right.LowestCostToGetHere = current.LowestCostToGetHere + 1 + 1000;
-                    right.ArrivedHereFrom = current;
+                    right.BestWayHere = current;
+                    right.WalkedHereFacing = TurnRight(_direction);
                 }
             }
             var tmp = current;
             current = _flatList.Where(l => l.Visited == false && l.LowestCostToGetHere.HasValue).OrderBy(l => l.LowestCostToGetHere).First();
             current.Visited = true;
-            Print();
+          //  Thread.Sleep(50);
+           // Print();
         }
 
+        //Walk best path in reverse add trails
+        var uniqueLocations = WalkBack(_end, _start);
 
+        Print2();
+        Console.WriteLine();
+        Console.WriteLine(uniqueLocations.Count);
+    }
 
+    private HashSet<Location> WalkBack(Location beginning, Location target)
+    {
+        var locations = new HashSet<Location>();
 
+        locations.Add(target);
+        var current = beginning;
+        while (!(current.X == target.X && current.Y == target.Y))
+        {
+            current.PrintedBackwards = true;
+            current = current.BestWayHere;
+            locations.Add(current);
+            if (current.PossibleWaysHere.Count > 1)
+            {
+                foreach (var way in current.PossibleWaysHere)
+                {
+                    locations.UnionWith(WalkBack(way, target));
+                }
+            }
+
+        }
+        target.PrintedBackwards = true;
+        return locations;
     }
 
     private void Print()
@@ -100,12 +136,29 @@ public class Day16
             var s = "";
             for (int j = 0; j < _xLen; j++)
             {
-                s += _grid[i, j].Visited ? "¤" : _grid[i, j].Value;
+                s += _grid[i, j].PrintedBackwards ? 'O' : _grid[i, j].Visited ? "." : _grid[i, j].Value;
             }
             Console.WriteLine(s);
         }
     }
 
+    private void Print2()
+    {
+        var p = "Day16\\output.txt";
+        if (File.Exists(p))
+            File.Delete(p);
+            var lines = new List<string>();
+        for (int i = 0; i < _yLen; i++)
+        {
+            var s = "";
+            for (int j = 0; j < _xLen; j++)
+            {
+                s += _grid[i, j].PrintedBackwards ? 'O' : _grid[i, j].Visited ? "." : _grid[i, j].Value;
+            }
+            lines.Add(s);
+        }
+        File.WriteAllLines(p,lines);
+    }
     private Location? GetForward(Location l)
     {
         switch (_direction)
@@ -157,26 +210,38 @@ public class Day16
         }
         return null;
     }
-    private List<Location> GetNeighbours(Location l)
+
+    private DirectionEnum TurnRight(DirectionEnum direction)
     {
-        var neighbours = new List<Location>();
-        var north = GetLocation(l.Y - 1, l.X);
-        if (north != null)
-            neighbours.Add(north);
+        switch (direction)
+        {
+            case DirectionEnum.North:
+                return DirectionEnum.East;
+            case DirectionEnum.East:
+                return DirectionEnum.South;
+            case DirectionEnum.South:
+                return DirectionEnum.West;
+            case DirectionEnum.West:
+                return DirectionEnum.North;
 
-        var south = GetLocation(l.Y - 1, l.X);
-        if (south != null)
-            neighbours.Add(south);
+        }
+        throw new NotImplementedException();
+    }
+    private DirectionEnum TurnLeft(DirectionEnum direction)
+    {
+        switch (direction)
+        {
+            case DirectionEnum.North:
+                return DirectionEnum.West;
+            case DirectionEnum.East:
+                return DirectionEnum.North;
+            case DirectionEnum.South:
+                return DirectionEnum.East;
+            case DirectionEnum.West:
+                return DirectionEnum.South;
 
-        var west = GetLocation(l.Y, l.X - 1);
-        if (west != null)
-            neighbours.Add(west);
-
-        var east = GetLocation(l.Y, l.X + 1);
-        if (east != null)
-            neighbours.Add(east);
-
-        return neighbours;
+        }
+        throw new NotImplementedException();
     }
     private Location? GetLocation(int y, int x)
     {
@@ -205,10 +270,18 @@ public class Day16
 
 public class Location
 {
+
+    public Location()
+    {
+        PossibleWaysHere = [];
+    }
+    public bool PrintedBackwards { get; set; }
     public bool Visited { get; set; }
     public int? LowestCostToGetHere { get; set; }
     public char Value { get; set; }
-    public int X { get; internal set; }
-    public int Y { get; internal set; }
-    public Location ArrivedHereFrom { get; internal set; }
+    public int X { get; set; }
+    public int Y { get; set; }
+    public Location BestWayHere { get; set; }
+    public List<Location> PossibleWaysHere { get; set; }
+    public DirectionEnum WalkedHereFacing { get; set; }
 }
