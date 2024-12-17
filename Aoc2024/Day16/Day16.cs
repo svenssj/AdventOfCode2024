@@ -52,7 +52,7 @@ public class Day16
         _start.LowestCostToGetHere = 0;
         _start.Visited = true;
         _start.WalkedHereFacing = _direction;
-        while (!(current.X == _end.X && current.Y == _end.Y))
+        while (!_flatList.All(v => v.Visited))
         {
             _direction = current.WalkedHereFacing;
             var left = GetLeft(current);
@@ -90,17 +90,20 @@ public class Day16
                 }
             }
             var tmp = current;
-            current = _flatList.Where(l => l.Visited == false && l.LowestCostToGetHere.HasValue).OrderBy(l => l.LowestCostToGetHere).First();
+            current = _flatList.Where(l => l.Visited == false && l.LowestCostToGetHere.HasValue).OrderBy(l => l.LowestCostToGetHere).FirstOrDefault();
+            if (current == null)
+                break;
             current.Visited = true;
-          //  Thread.Sleep(50);
-           // Print();
+            //  Thread.Sleep(50);
+             Print(true);
         }
 
         //Walk best path in reverse add trails
         var uniqueLocations = WalkBack(_end, _start);
-
+        Print(false);
         Print2();
         Console.WriteLine();
+        Console.WriteLine("Lowest cost to end: " + _end.LowestCostToGetHere);
         Console.WriteLine(uniqueLocations.Count);
     }
 
@@ -115,39 +118,46 @@ public class Day16
             current.PrintedBackwards = true;
             current = current.BestWayHere;
             locations.Add(current);
-            if (current.PossibleWaysHere.Count > 1)
-            {
-                foreach (var way in current.PossibleWaysHere)
-                {
-                    locations.UnionWith(WalkBack(way, target));
-                }
-            }
+
+            // foreach (var way in current.PossibleWaysHere)
+            // {
+            //     if (!locations.Contains(way))
+            //         locations.UnionWith(WalkBack(way, target));
+            // }
+
 
         }
         target.PrintedBackwards = true;
         return locations;
     }
 
-    private void Print()
+    private void Print(bool console)
     {
 
+        var p = "Day16\\output.txt";
+        if (File.Exists(p))
+            File.Delete(p);
+        var lines = new List<string>();
         for (int i = 0; i < _yLen; i++)
         {
             var s = "";
             for (int j = 0; j < _xLen; j++)
             {
-                s += _grid[i, j].PrintedBackwards ? 'O' : _grid[i, j].Visited ? "." : _grid[i, j].Value;
+                s += _grid[i, j].Visited ? "X" : _grid[i, j].Value;
             }
-            Console.WriteLine(s);
+            if(console)
+                Console.WriteLine(s);
+            lines.Add(s);
         }
+        File.WriteAllLines(p, lines);
     }
 
     private void Print2()
     {
-        var p = "Day16\\output.txt";
+        var p = "Day16\\output2.txt";
         if (File.Exists(p))
             File.Delete(p);
-            var lines = new List<string>();
+        var lines = new List<string>();
         for (int i = 0; i < _yLen; i++)
         {
             var s = "";
@@ -157,7 +167,7 @@ public class Day16
             }
             lines.Add(s);
         }
-        File.WriteAllLines(p,lines);
+        File.WriteAllLines(p, lines);
     }
     private Location? GetForward(Location l)
     {
