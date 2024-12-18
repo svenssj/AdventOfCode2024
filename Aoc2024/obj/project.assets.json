@@ -8,19 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Jonathan\\.nuget\\packages\\": {}
+    "C:\\Users\\JonathanSvensson\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Jonathan\\Code\\AoC24\\AdventOfCode2024\\Aoc2024\\Aoc2024.csproj",
+      "projectUniqueName": "C:\\Users\\JonathanSvensson\\code\\AdventOfCode2024\\Aoc2024\\Aoc2024.csproj",
       "projectName": "Aoc2024",
-      "projectPath": "C:\\Users\\Jonathan\\Code\\AoC24\\AdventOfCode2024\\Aoc2024\\Aoc2024.csproj",
-      "packagesPath": "C:\\Users\\Jonathan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Jonathan\\Code\\AoC24\\AdventOfCode2024\\Aoc2024\\obj\\",
+      "projectPath": "C:\\Users\\JonathanSvensson\\code\\AdventOfCode2024\\Aoc2024\\Aoc2024.csproj",
+      "packagesPath": "C:\\Users\\JonathanSvensson\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\JonathanSvensson\\code\\AdventOfCode2024\\Aoc2024\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Jonathan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\JonathanSvensson\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -28,6 +28,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -66,7 +67,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

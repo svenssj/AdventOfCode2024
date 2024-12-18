@@ -17,7 +17,7 @@ public class Day16
     {
 
 
-        var lines = File.ReadAllLines("Day16\\input.txt");
+        var lines = File.ReadAllLines("Day16\\eight.txt");
         _flatList = new List<Location>();
         _yLen = lines.Length;
         _xLen = lines[0].Length;
@@ -52,42 +52,53 @@ public class Day16
         _start.LowestCostToGetHere = 0;
         _start.Visited = true;
         _start.WalkedHereFacing = _direction;
-        while (!_flatList.All(v => v.Visited))
+        while (!(current.X == _end.X && current.Y == _end.Y))
         {
             _direction = current.WalkedHereFacing;
             var left = GetLeft(current);
             if (left != null)
             {
-                left.PossibleWaysHere.Add(current);
-                if (!left.LowestCostToGetHere.HasValue || current.LowestCostToGetHere + 1 + 1000 < left.LowestCostToGetHere)
+                var leftSteps = current.LowestCostToGetHere.Value + 1 + 1000;
+                left.PossibleWaysToGetHere.Add(current);
+                if (!left.LowestCostToGetHere.HasValue || leftSteps < left.LowestCostToGetHere)
                 {
-                    left.LowestCostToGetHere = current.LowestCostToGetHere + 1 + 1000;
+
+                    left.LowestCostToGetHere = leftSteps;
                     left.BestWayHere = current;
                     left.WalkedHereFacing = TurnLeft(_direction);
                 }
+
             }
             var forward = GetForward(current);
             if (forward != null)
                 if (forward != null)
                 {
-                    forward.PossibleWaysHere.Add(current);
-                    if (!forward.LowestCostToGetHere.HasValue || current.LowestCostToGetHere + 1 < forward.LowestCostToGetHere)
+                    var forwardSteps = current.LowestCostToGetHere.Value + 1;
+
+                    forward.PossibleWaysToGetHere.Add(current);
+                    if (!forward.LowestCostToGetHere.HasValue || forwardSteps < forward.LowestCostToGetHere)
                     {
-                        forward.LowestCostToGetHere = current.LowestCostToGetHere + 1;
+
+                        forward.LowestCostToGetHere = forwardSteps;
                         forward.BestWayHere = current;
                         forward.WalkedHereFacing = _direction;
                     }
+
                 }
             var right = GetRight(current);
             if (right != null)
             {
-                right.PossibleWaysHere.Add(current);
-                if (!right.LowestCostToGetHere.HasValue || current.LowestCostToGetHere + 1 + 1000 < right.LowestCostToGetHere)
+                var rightSteps = current.LowestCostToGetHere.Value + 1 + 1000;
+
+                right.PossibleWaysToGetHere.Add(current);
+                if (!right.LowestCostToGetHere.HasValue || rightSteps < right.LowestCostToGetHere)
                 {
-                    right.LowestCostToGetHere = current.LowestCostToGetHere + 1 + 1000;
+
+                    right.LowestCostToGetHere = rightSteps;
                     right.BestWayHere = current;
                     right.WalkedHereFacing = TurnRight(_direction);
                 }
+
             }
             var tmp = current;
             current = _flatList.Where(l => l.Visited == false && l.LowestCostToGetHere.HasValue).OrderBy(l => l.LowestCostToGetHere).FirstOrDefault();
@@ -95,7 +106,8 @@ public class Day16
                 break;
             current.Visited = true;
             //  Thread.Sleep(50);
-             Print(true);
+            // Console.WriteLine();
+            // Print(true);
         }
 
         //Walk best path in reverse add trails
@@ -110,7 +122,7 @@ public class Day16
     private HashSet<Location> WalkBack(Location beginning, Location target)
     {
         var locations = new HashSet<Location>();
-
+        locations.Add(beginning);
         locations.Add(target);
         var current = beginning;
         while (!(current.X == target.X && current.Y == target.Y))
@@ -119,11 +131,13 @@ public class Day16
             current = current.BestWayHere;
             locations.Add(current);
 
-            // foreach (var way in current.PossibleWaysHere)
-            // {
-            //     if (!locations.Contains(way))
-            //         locations.UnionWith(WalkBack(way, target));
-            // }
+            var ways = current.PossibleWaysToGetHere;
+            if (ways.Count > 1)
+                foreach (var way in ways)
+                {
+                    if (!locations.Contains(way))
+                        locations.UnionWith(WalkBack(way, target));
+                }
 
 
         }
@@ -145,7 +159,7 @@ public class Day16
             {
                 s += _grid[i, j].Visited ? "X" : _grid[i, j].Value;
             }
-            if(console)
+            if (console)
                 Console.WriteLine(s);
             lines.Add(s);
         }
@@ -283,7 +297,7 @@ public class Location
 
     public Location()
     {
-        PossibleWaysHere = [];
+        PossibleWaysToGetHere = [];
     }
     public bool PrintedBackwards { get; set; }
     public bool Visited { get; set; }
@@ -292,6 +306,6 @@ public class Location
     public int X { get; set; }
     public int Y { get; set; }
     public Location BestWayHere { get; set; }
-    public List<Location> PossibleWaysHere { get; set; }
+    public List<Location> PossibleWaysToGetHere { get; set; }
     public DirectionEnum WalkedHereFacing { get; set; }
 }

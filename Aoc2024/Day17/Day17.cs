@@ -2,18 +2,18 @@ using System.Collections;
 
 public class InitialState
 {
-    public int A { get; set; }
-    public int B { get; set; }
-    public int C { get; set; }
+    public long A { get; set; }
+    public long B { get; set; }
+    public long C { get; set; }
     public required string InitString { get; set; }
 }
 
 public class Day17
 {
 
-    int A { get; set; }
-    int B { get; set; }
-    int C { get; set; }
+    long A { get; set; }
+    long B { get; set; }
+    long C { get; set; }
 
 
     List<int> instructions;
@@ -69,7 +69,7 @@ public class Day17
         var len = instructions.Count;
         InstructionPointer = 0;
 
-        var result = new List<int>();
+        var result = new List<long>();
         while (InstructionPointer < len)
         {
 
@@ -122,7 +122,7 @@ public class Day17
     public void Adv(int combo)
     {
 
-        A = int.Parse((A / (Math.Pow(2, GetVal(combo)))).ToString().Split(',')[0]);
+        A = long.Parse((A / (Math.Pow(2, GetVal(combo)))).ToString().Split(',')[0]);
     }
     //opcode 1
     public void Bxl(int literal)
@@ -198,24 +198,22 @@ public class Day17
 
     }
     //opcode 5
-    public int Out(int combo)
+    public long Out(int combo)
     {
         return GetVal(combo) % 8;
     }
     //opcode 6
     public void Bdv(int combo)
     {
-        B = int.Parse((A / (Math.Pow(2, GetVal(combo)))).ToString().Split(',')[0]);
+        B = long.Parse((A / (Math.Pow(2, GetVal(combo)))).ToString().Split(',')[0]);
     }
     //opcode 7
     public void Cdv(int combo)
     {
-        C = int.Parse((A / (Math.Pow(2, GetVal(combo)))).ToString().Split(',')[0]);
+        C = long.Parse((A / (Math.Pow(2, GetVal(combo)))).ToString().Split(',')[0]);
     }
 
-
-
-    public int GetVal(int opcode)
+    public long GetVal(int opcode)
     {
         if (opcode >= 0 && opcode <= 3)
             return opcode;
@@ -228,22 +226,78 @@ public class Day17
         throw new Exception("Invalid op code");
     }
 
-    public bool[] ToBits(int i)
-    {
-        return new BitArray(new int[] { i }).Cast<bool>().Reverse().ToArray();
-    }
-
-    public int ToInt(bool[] bits)
+    public bool[] ToBits(long l)
     {
 
-        var len = bits.Length - 1;
-        var res = 0;
-        for (int i = len; i >= 0; i--)
+        var longString = Convert.ToString(l, 2);
+
+
+
+        var diff = 64 - longString.Length;
+        for (int i = 0; i < diff; i++)
         {
-            if (bits[i])
-                res += int.Parse(Math.Pow(2, (len - i)).ToString());
+            longString = '0' + longString;
         }
 
+
+
+        var bools = new bool[64];
+
+        for (int i = 0; i < 64; i++)
+        {
+            bools[i] = longString[i] == '1';
+        }
+
+        return bools;
+
+    }
+
+    public long ToInt(bool[] bits)
+    {
+
+        var s = "";
+        foreach (var bit in bits)
+        {
+            s += bit ? "1" : "0";
+        }
+
+        var res = Convert.ToInt64(s, 2);
         return res;
     }
 }
+
+
+
+// var program = "2,4,1,3,7,5,0,3,4,1,1,5,5,5,3,0";
+// var output = "";
+
+
+
+// int jumper = 1;
+// string prevmatch = "";
+// List<long> thingsToTry = [1];
+// var sw = new Stopwatch();
+// sw.Start();
+// while (thingsToTry.Any())
+// {
+//     var current = thingsToTry.First();
+//     thingsToTry.RemoveAt(0);
+//     for (int i = 0; i < 8; i++)
+//     {
+//         var day = new Day17(new InitialState() { A = current + i, InitString = program });
+//         output = day.Run();
+//         if (program.EndsWith(output))
+//         {
+//             thingsToTry.Add((current + i) * 8);
+//            // Console.WriteLine(current + i + " - " + output);
+//             if (output == program)
+//                 break;
+//         }
+
+
+//     }
+
+// }
+// sw.Stop();
+// Console.WriteLine(sw.ElapsedMilliseconds + "ms");
+// Console.WriteLine("completed");
