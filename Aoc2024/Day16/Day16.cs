@@ -17,7 +17,7 @@ public class Day16
     {
 
 
-        var lines = File.ReadAllLines("Day16\\eight.txt");
+        var lines = File.ReadAllLines("Day16\\example.txt");
         _flatList = new List<Location>();
         _yLen = lines.Length;
         _xLen = lines[0].Length;
@@ -52,20 +52,24 @@ public class Day16
         _start.LowestCostToGetHere = 0;
         _start.Visited = true;
         _start.WalkedHereFacing = _direction;
-        while (!(current.X == _end.X && current.Y == _end.Y))
+        while (!_flatList.All(l => l.Visited))
         {
             _direction = current.WalkedHereFacing;
             var left = GetLeft(current);
             if (left != null)
             {
                 var leftSteps = current.LowestCostToGetHere.Value + 1 + 1000;
-                left.PossibleWaysToGetHere.Add(current);
+
                 if (!left.LowestCostToGetHere.HasValue || leftSteps < left.LowestCostToGetHere)
                 {
-
+                    left.PossibleWaysToGetHere = [current];
                     left.LowestCostToGetHere = leftSteps;
                     left.BestWayHere = current;
                     left.WalkedHereFacing = TurnLeft(_direction);
+                }
+                else if (leftSteps == left.LowestCostToGetHere)
+                {
+                    left.PossibleWaysToGetHere.Add(current);
                 }
 
             }
@@ -75,14 +79,20 @@ public class Day16
                 {
                     var forwardSteps = current.LowestCostToGetHere.Value + 1;
 
-                    forward.PossibleWaysToGetHere.Add(current);
+
                     if (!forward.LowestCostToGetHere.HasValue || forwardSteps < forward.LowestCostToGetHere)
                     {
-
+                        forward.PossibleWaysToGetHere = [current];
                         forward.LowestCostToGetHere = forwardSteps;
                         forward.BestWayHere = current;
                         forward.WalkedHereFacing = _direction;
                     }
+                    else if (forwardSteps == forward.LowestCostToGetHere)
+                    {
+                        forward.PossibleWaysToGetHere.Add(current);
+                    }
+
+
 
                 }
             var right = GetRight(current);
@@ -90,13 +100,17 @@ public class Day16
             {
                 var rightSteps = current.LowestCostToGetHere.Value + 1 + 1000;
 
-                right.PossibleWaysToGetHere.Add(current);
-                if (!right.LowestCostToGetHere.HasValue || rightSteps < right.LowestCostToGetHere)
-                {
 
+                if (!right.LowestCostToGetHere.HasValue || rightSteps <= right.LowestCostToGetHere)
+                {
+                    right.PossibleWaysToGetHere = [current];
                     right.LowestCostToGetHere = rightSteps;
                     right.BestWayHere = current;
                     right.WalkedHereFacing = TurnRight(_direction);
+                }
+                else if (rightSteps == right.LowestCostToGetHere)
+                {
+                    right.PossibleWaysToGetHere.Add(current);
                 }
 
             }
@@ -114,6 +128,8 @@ public class Day16
         var uniqueLocations = WalkBack(_end, _start);
         Print(false);
         Print2();
+        var l = uniqueLocations.ToList();
+        PrintLocations(l);
         Console.WriteLine();
         Console.WriteLine("Lowest cost to end: " + _end.LowestCostToGetHere);
         Console.WriteLine(uniqueLocations.Count);
@@ -143,6 +159,24 @@ public class Day16
         }
         target.PrintedBackwards = true;
         return locations;
+    }
+
+    private void PrintLocations(List<Location> locations)
+    {
+        for (int i = 0; i < _yLen; i++)
+        {
+            var s = "";
+            for (int j = 0; j < _xLen; j++)
+            {
+                if (locations.Any(l => l.X == j && l.Y == i))
+                    s += 'O';
+                else
+                    s += _grid[i, j].Value;
+            }
+            Console.WriteLine(s);
+
+        }
+
     }
 
     private void Print(bool console)
