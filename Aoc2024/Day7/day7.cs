@@ -113,5 +113,8 @@ public enum OperatorEnum
 {
     Add,
     Multiply,
-    Comb
+    Comb,
+    AND,
+    OR,
+    XOR
 }
