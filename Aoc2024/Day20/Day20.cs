@@ -11,11 +11,11 @@ public class Day20
     int _yLen;
     int _xLen;
 
-    int CHEAT_LIM = 5;
+    int CHEAT_LIM = 21;
     public Day20()
     {
 
-        var lines = File.ReadAllLines("Day20\\example.txt");
+        var lines = File.ReadAllLines("Day20\\input.txt");
 
         _yLen = lines.Count();
         _xLen = lines[0].Length;
@@ -45,6 +45,8 @@ public class Day20
     {
 
         var _start = _flatList.Single(l => l.Value == 'S');
+
+        PrintRhombus(_start, true);
         var _end = _flatList.Single(l => l.Value == 'E');
         var current = _start;
         _start.LowestCostToGetHere = 0;
@@ -101,7 +103,7 @@ public class Day20
             if (current == null)
             {
 
-                Print();
+
                 break;
             }
             current.Visited = true;
@@ -110,6 +112,7 @@ public class Day20
 
         var path = _flatList.Where(v => v.Visited).OrderBy(l => l.LowestCostToGetHere).ToList();
 
+        Print();
         path.ForEach(p =>
             p.Visited = false
         );
@@ -123,9 +126,9 @@ public class Day20
 
 
         Console.WriteLine(_flatList.Count(l => l.Visited));
-        Print();
 
-        Console.WriteLine(_cheats.Count(kvp => kvp.Value >= 50));
+
+        Console.WriteLine(_cheats.Count(kvp => kvp.Value >= 100));
     }
 
     private void CheatPart2(Location location)
@@ -135,63 +138,84 @@ public class Day20
         var y = location.Y;
         var x = location.X;
 
-        var south = GetLocation(y + 1, x, true);
-        if (south.Value == '#')
+
+        var nodes = GetCheatNodes(y, x, CHEAT_LIM);
+
+        //neighbouring walls
+        var ends = nodes.Where(n => n.Value !='#' && n.Visited == false);
+
+        foreach (var end in ends)
         {
-            var nodes = GetCheatNodes(south.Y, south.X);
-
-            var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
-
-            foreach (var end in validEnds)
-            {
-                var key = $"{south.X}-{south.Y}|{end.X}-{end.Y}";
-                if (!_cheats.ContainsKey(key))
-                    _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
-
-            }
-
+            var key = $"{x}-{y}|{end.X}-{end.Y}";
+            if (!_cheats.ContainsKey(key))
+                _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
         }
-        var north = GetLocation(y - 1, x, true);
-        if (north.Value == '#')
-        {
-            var nodes = GetCheatNodes(north.Y, north.X);
 
-            var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
+        //     var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
 
-            foreach (var end in validEnds)
-            {
-                var key = $"{north.X}-{north.Y}|{end.X}-{end.Y}";
-                if (!_cheats.ContainsKey(key))
-                    _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
-            }
-        }
-        var west = GetLocation(y, x - 1, true);
-        if (west.Value == '#')
-        {
-            var nodes = GetCheatNodes(west.Y, west.X);
-            var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
+        //     foreach (var end in validEnds)
+        //     {
+        //         var key = $"{south.X}-{south.Y}|{end.X}-{end.Y}";
+        //         if (!_cheats.ContainsKey(key))
+        //             _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
 
-            foreach (var end in validEnds)
-            {
-                var key = $"{west.X}-{west.Y}|{end.X}-{end.Y}";
-                if (!_cheats.ContainsKey(key))
-                    _cheats.Add($"{west.X}-{west.Y}|{end.X}-{end.Y}", end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
-            }
-        }
-        var east = GetLocation(y, x + 1, true);
-        if (east.Value == '#')
-        {
-            //  PrintRhombus(east, true);
-            var nodes = GetCheatNodes(east.Y, east.X);
-            var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
+        // var south = GetLocation(y + 1, x, true);
+        // if (south.Value == '#')
+        // {
+        //     var nodes = GetCheatNodes(south.Y, south.X);
 
-            foreach (var end in validEnds)
-            {
-                var key = $"{east.X}-{east.Y}|{end.X}-{end.Y}";
-                if (!_cheats.ContainsKey(key))
-                    _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
-            }
-        }
+        //     var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
+
+        //     foreach (var end in validEnds)
+        //     {
+        //         var key = $"{south.X}-{south.Y}|{end.X}-{end.Y}";
+        //         if (!_cheats.ContainsKey(key))
+        //             _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
+
+        //     }
+
+        // }
+        // var north = GetLocation(y - 1, x, true);
+        // if (north.Value == '#')
+        // {
+        //     var nodes = GetCheatNodes(north.Y, north.X);
+
+        //     var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
+
+        //     foreach (var end in validEnds)
+        //     {
+        //         var key = $"{north.X}-{north.Y}|{end.X}-{end.Y}";
+        //         if (!_cheats.ContainsKey(key))
+        //             _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
+        //     }
+        // }
+        // var west = GetLocation(y, x - 1, true);
+        // if (west.Value == '#')
+        // {
+        //     var nodes = GetCheatNodes(west.Y, west.X);
+        //     var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
+
+        //     foreach (var end in validEnds)
+        //     {
+        //         var key = $"{west.X}-{west.Y}|{end.X}-{end.Y}";
+        //         if (!_cheats.ContainsKey(key))
+        //             _cheats.Add($"{west.X}-{west.Y}|{end.X}-{end.Y}", end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
+        //     }
+        // }
+        // var east = GetLocation(y, x + 1, true);
+        // if (east.Value == '#')
+        // {
+        //     //  PrintRhombus(east, true);
+        //     var nodes = GetCheatNodes(east.Y, east.X);
+        //     var validEnds = nodes.Where(n => n.Value == '.' && !n.Visited);
+
+        //     foreach (var end in validEnds)
+        //     {
+        //         var key = $"{east.X}-{east.Y}|{end.X}-{end.Y}";
+        //         if (!_cheats.ContainsKey(key))
+        //             _cheats.Add(key, end.LowestCostToGetHere.Value - location.LowestCostToGetHere.Value - GetDistance(end, location));
+        //     }
+        // }
 
 
 
@@ -259,13 +283,13 @@ public class Day20
             }
     }
 
-    private List<Location> GetCheatNodes(int y, int x)
+    private List<Location> GetCheatNodes(int y, int x, int lim)
     {
         var list = new List<Location>();
 
-        for (int i = -CHEAT_LIM+1; i < CHEAT_LIM; i++)
+        for (int i = -lim + 1; i < lim; i++)
         {
-            var diff = i < 0 ? CHEAT_LIM - (i * -1) : CHEAT_LIM - i;
+            var diff = i < 0 ? lim - (i * -1) : lim - i;
             if (diff < 0)
                 diff *= -1;
 
@@ -290,7 +314,7 @@ public class Day20
     void PrintRhombus(Location start, bool highlight)
     {
 
-        var nodes = GetCheatNodes(start.Y, start.X);
+        var nodes = GetCheatNodes(start.Y, start.X, 7);
         Console.WriteLine();
         for (int i = 0; i < _yLen; i++)
         {

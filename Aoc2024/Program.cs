@@ -1,7 +1,7 @@
 ﻿// // See https://aka.ms/new-console-template for more information
 
- var d = new Day20();
- d.Run();
+var d = new Day23();
+d.Run();
 
 
 
